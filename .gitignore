@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 EBikeAppWebAPI/appsettings.json
+
+
+EBikeAppWebAPI.data/migrations/
