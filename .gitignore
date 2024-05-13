@@ -362,4 +362,11 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+<<<<<<< Tokenazation
 EBikeAppWebAPI/appsettings.json
+=======
+EBikeAppWebAPI/appsettings.json
+
+
+EBikeAppWebAPI.data/migrations/
+>>>>>>> master
