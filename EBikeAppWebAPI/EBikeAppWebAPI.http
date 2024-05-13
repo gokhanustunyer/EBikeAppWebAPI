@@ -1,0 +1,6 @@
+@EBikeAppWebAPI_HostAddress = http://localhost:5204
+
+GET {{EBikeAppWebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
