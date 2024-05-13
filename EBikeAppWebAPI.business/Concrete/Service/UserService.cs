@@ -1,4 +1,7 @@
-﻿using EBikeAppWebAPI.business.Abstract.Service;
+﻿using EBikeAppWebAPI.business.Abstract.Handler;
+using EBikeAppWebAPI.business.Abstract.Service;
+using EBikeAppWebAPI.business.DTOs;
+using EBikeAppWebAPI.business.Exceptions;
 using EBikeAppWebAPI.business.ViewModel.User;
 using EBikeAppWebAPI.data.Abstract.Auth.Endpoint;
 using EBikeAppWebAPI.data.Context;
@@ -20,20 +23,26 @@ namespace EBikeAppWebAPI.business.Concrete.Service
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IEmailService _emailService;
         private readonly RoleManager<AppRole> _roleManager;
-        private readonly IEndpointRepository _endpointRepository;
+        private readonly ITokenHandler _tokenHandler;
+        readonly SignInManager<AppUser> _singInManager;
+        private readonly EBikeDbContext _ebikeDbContext;
         public UserService(EBikeDbContext context,
                            UserManager<AppUser> userManager,
                            SignInManager<AppUser> signInManager,
                            IEmailService emailService,
                            RoleManager<AppRole> roleManager,
-                           IEndpointRepository endpointRepository)
+                           ITokenHandler tokenHandler,
+                           SignInManager<AppUser> singInManager,
+                           EBikeDbContext ebikeDbContext)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _emailService = emailService;
             _roleManager = roleManager;
-            _endpointRepository = endpointRepository;
+            _tokenHandler = tokenHandler;
+            _singInManager = singInManager;
+            _ebikeDbContext = ebikeDbContext;
         }
 
         public async Task<bool> CreateUser(UserCreateModel model)
@@ -186,6 +195,71 @@ namespace EBikeAppWebAPI.business.Concrete.Service
             }
             result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
             return result.Succeeded;
+        }
+
+        public async Task<LoginUserResponse> LoginAsync(string email, string password)
+        {
+            int accessTokenLifeTime = 2700;
+            AppUser user = await _userManager.FindByNameAsync(email);
+            if (user == null)
+                user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                throw new NotFoundUserException("Es gibt auf diese Weise keinen registrierten Benutzer");
+            if (!user.EmailConfirmed)
+                throw new AuthenticationErrorException();
+
+            SignInResult result = await _singInManager.CheckPasswordSignInAsync(user, password, false);
+
+            if (result.Succeeded)
+            {
+                Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime, user);
+                await UpdateRefreshToken(user, token.RefreshToken, token.Expiration, 900);
+                return new LoginUserResponse()
+                {
+                    AccessToken = token.AccessToken,
+                    Expiration = token.Expiration,
+                    RefreshToken = token.RefreshToken
+                };
+            }
+            throw new AuthenticationErrorException();
+        }
+
+        public async Task<bool> UpdateRefreshToken(AppUser user, string refreshToken, DateTime acccessTokenDate, int addOnAccessTokenSecond)
+        {
+            if (user != null)
+            {
+                user.RefreshToken = refreshToken;
+                user.RefreshTokenEndDate = acccessTokenDate.AddSeconds(addOnAccessTokenSecond);
+                await _userManager.UpdateAsync(user);
+                return true;
+            }
+            throw new DirectoryNotFoundException();
+        }
+        public async Task<bool> IsAdminTokenAsync(string? refreshToken)
+        {
+            if (refreshToken != null)
+            {
+                AppUser user = _ebikeDbContext.Users.FirstOrDefault(u => u.RefreshToken == refreshToken);
+                if (user != null)
+                {
+                    bool isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+                    bool isSuperAdmin = await _userManager.IsInRoleAsync(user, "Super Admin");
+                    return isAdmin || isSuperAdmin;
+                }
+            }
+            return false;
+        }
+        public async Task<Token> RefreshTokenLoginAsync(string refreshToken)
+        {
+            AppUser? user = _userManager.Users.FirstOrDefault(u => u.RefreshToken == refreshToken);
+            if (user != null && user.RefreshTokenEndDate > DateTime.UtcNow)
+            {
+                Token token = _tokenHandler.CreateAccessToken(2700, user);
+                await UpdateRefreshToken(user, token.RefreshToken, token.Expiration, 900);
+                return token;
+            }
+            else
+                throw new NotFoundUserException();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using EBikeAppWebAPI.business.Abstract.Service;
+﻿using EBikeAppWebAPI.business.Abstract.Handler;
+using EBikeAppWebAPI.business.Abstract.Service;
+using EBikeAppWebAPI.business.Concrete.Handler;
 using EBikeAppWebAPI.business.Concrete.Service;
 using EBikeAppWebAPI.data;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +16,8 @@ namespace EBikeAppWebAPI.business
 
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ITokenHandler, TokenHandler>();
+
         }
     }
 }

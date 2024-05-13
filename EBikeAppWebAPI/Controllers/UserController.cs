@@ -16,11 +16,30 @@ namespace EBikeAppWebAPI.Controllers
             _userService = userService;
         }
 
-        [HttpPost("action")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> Register(UserCreateModel model)
         {
             bool isComplete = await _userService.CreateUser(model);
             return Ok(isComplete);
+        }
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Login([FromBody] LoginUserModel model)
+        {
+            var response = await _userService.LoginAsync(model.Email, model.Password);
+            return Ok(response);
+        }
+        [HttpGet("[action]")]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
+        {
+            var response = await _userService.ConfirmEmail(userId, token);
+            return Ok(response);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+        {
+            var response = await _userService.ResetPasswordAsync(model);
+            return Ok(response);
         }
     }
 }
