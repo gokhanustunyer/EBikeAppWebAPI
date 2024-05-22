@@ -16,5 +16,9 @@ namespace EBikeAppWebAPI.entity.Identity
         public DateTime UpdateDate { get; set; }
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenEndDate { get; set; }
+        public ICollection<CreditCard.CreditCard> CreditCards { get; set; }
+        public ICollection<Ride.Ride> Rides { get; set; }
+        public string? CloseBikeToken { get; set; }
+
     }
 }

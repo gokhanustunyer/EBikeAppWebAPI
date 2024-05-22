@@ -1,6 +1,9 @@
 ﻿using EBikeAppWebAPI.entity.Auth;
 using EBikeAppWebAPI.entity.Base;
+using EBikeAppWebAPI.entity.Bike;
+using EBikeAppWebAPI.entity.CreditCard;
 using EBikeAppWebAPI.entity.Identity;
+using EBikeAppWebAPI.entity.Ride;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -17,6 +20,9 @@ namespace EBikeAppWebAPI.data.Context
         public EBikeDbContext(DbContextOptions options) : base(options) { }
         public DbSet<Menu> Menus { get; set; }
         public DbSet<Endpoint> Endpoints { get; set; }
+        public DbSet<CreditCard> CreditCards { get; set; }
+        public DbSet<Bike> Bikes { get; set; }
+        public DbSet<Ride> Rides { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
