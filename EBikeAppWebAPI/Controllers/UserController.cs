@@ -1,5 +1,8 @@
 ﻿using EBikeAppWebAPI.business.Abstract.Service;
+using EBikeAppWebAPI.business.CustomAttributes;
+using EBikeAppWebAPI.business.Enums;
 using EBikeAppWebAPI.business.ViewModel.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,11 +37,26 @@ namespace EBikeAppWebAPI.Controllers
             var response = await _userService.ConfirmEmail(userId, token);
             return Ok(response);
         }
-
         [HttpPost("[action]")]
         public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
         {
             var response = await _userService.ResetPasswordAsync(model);
+            return Ok(response);
+        }
+        [HttpGet("[action]")]
+        [Authorize(AuthenticationSchemes = "Admin")]
+        [AuthorizeDefinition(ActionType = ActionType.Reading, Definition = "Get Logged In User Profile", Menu = "UsersUI")]
+        public async Task<IActionResult> GetLoggedInUser()
+        {
+            var response = await _userService.GetLoogedIdUserProfile();
+            return Ok(response);
+        }
+        [HttpGet("[action]")]
+        [Authorize(AuthenticationSchemes = "Admin")]
+        [AuthorizeDefinition(ActionType = ActionType.Reading, Definition = "Get Logged In User Past Rides", Menu = "UsersUI")]
+        public async Task<IActionResult> GetLoggedInUserPastRides()
+        {
+            var response = await _userService.GetLoggedInUserPastRides();
             return Ok(response);
         }
     }

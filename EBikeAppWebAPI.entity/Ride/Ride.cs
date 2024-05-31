@@ -15,5 +15,9 @@ namespace EBikeAppWebAPI.entity.Ride
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public float Price { get; set; }
+        public float StartLat { get; set; }
+        public float EndLat { get; set; }
+        public float StartLong { get; set; }
+        public float EndLong { get; set; }
     }
 }

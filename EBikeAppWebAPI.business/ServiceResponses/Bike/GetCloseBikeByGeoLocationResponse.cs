@@ -1,17 +1,15 @@
-﻿using EBikeAppWebAPI.entity.Base;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EBikeAppWebAPI.entity.Bike
+namespace EBikeAppWebAPI.business.ServiceResponses.Bike
 {
-    public class Bike: BaseEntity
+    public class GetCloseBikeByGeoLocationResponse
     {
+        public Guid Id { get; set; }
         public string Image { get; set; }
-        public string QrCode { get; set; }
-        public string Token { get; set; }
         public float Lat { get; set; }
         public float Long { get; set; }
         public float PricePerMin { get; set; }

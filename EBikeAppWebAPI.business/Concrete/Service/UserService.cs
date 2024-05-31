@@ -2,10 +2,12 @@
 using EBikeAppWebAPI.business.Abstract.Service;
 using EBikeAppWebAPI.business.DTOs;
 using EBikeAppWebAPI.business.Exceptions;
+using EBikeAppWebAPI.business.ServiceResponses.User;
 using EBikeAppWebAPI.business.ViewModel.User;
 using EBikeAppWebAPI.data.Abstract.Auth.Endpoint;
 using EBikeAppWebAPI.data.Context;
 using EBikeAppWebAPI.entity.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,6 +20,7 @@ namespace EBikeAppWebAPI.business.Concrete.Service
 {
     public class UserService : IUserService
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly EBikeDbContext _context;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
@@ -33,7 +36,8 @@ namespace EBikeAppWebAPI.business.Concrete.Service
                            RoleManager<AppRole> roleManager,
                            ITokenHandler tokenHandler,
                            SignInManager<AppUser> singInManager,
-                           EBikeDbContext ebikeDbContext)
+                           EBikeDbContext ebikeDbContext,
+                           IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _userManager = userManager;
@@ -43,6 +47,7 @@ namespace EBikeAppWebAPI.business.Concrete.Service
             _tokenHandler = tokenHandler;
             _singInManager = singInManager;
             _ebikeDbContext = ebikeDbContext;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<bool> CreateUser(UserCreateModel model)
@@ -260,6 +265,54 @@ namespace EBikeAppWebAPI.business.Concrete.Service
             }
             else
                 throw new NotFoundUserException();
+        }
+
+        public async Task<GetLoogedIdUserProfileResponse> GetLoogedIdUserProfile()
+        {
+            string activeUserName = _httpContextAccessor.HttpContext.User.Identity.Name;
+            if (activeUserName != null)
+            {
+                AppUser user = await _userManager.FindByNameAsync(activeUserName);
+                return new()
+                {
+                    Name = user.Name,
+                    Surname = user.Surname,
+                    Email = user.Email
+                };
+            }
+            else
+            {
+                throw new NotFoundUserException();
+            }
+        }
+
+        public async Task<List<GetLoggedInUserPastRidesResponse>> GetLoggedInUserPastRides()
+        {
+            string activeUserName = _httpContextAccessor.HttpContext.User.Identity.Name;
+            if (activeUserName != null)
+            {
+                AppUser user = await _ebikeDbContext.Users.Include(u => u.Rides).FirstOrDefaultAsync(u => u.UserName == activeUserName);
+                return user.Rides.Select(r => new GetLoggedInUserPastRidesResponse()
+                {
+                     TotalPrice = r.Price,
+                     EndDate = r.EndDate,
+                     StartDate = r.StartDate,
+                     EndLocation = new ViewModel.Location.Location()
+                     {
+                         Lat = r.EndLat,
+                         Long = r.EndLong
+                     },
+                     StartLocation = new ViewModel.Location.Location()
+                     {
+                         Lat = r.StartLat,
+                         Long = r.StartLong
+                     }
+                }).ToList();
+            }
+            else
+            {
+                throw new NotFoundUserException();
+            }
         }
     }
 }

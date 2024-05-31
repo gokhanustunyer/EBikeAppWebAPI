@@ -1,4 +1,6 @@
 using EBikeAppWebAPI.business;
+using EBikeAppWebAPI.business.Abstract.Storage;
+using EBikeAppWebAPI.business.Concrete.Storage;
 using EBikeAppWebAPI.data.Context;
 using EBikeAppWebAPI.entity.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,7 +19,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddBusinessServices(builder.Configuration);
-
 
 builder.Services.AddIdentity<AppUser, AppRole>(options =>
 {
@@ -44,7 +45,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                         // Token'in ne kadar aktif kalacaginin suresini tutan deger.
                         ValidateIssuerSigningKey = true,
                         // Token'in uygulamaya ait oldugunu gosteren anahtar deger.
-
                         ValidAudience = builder.Configuration["Token:Audience"],
                         ValidIssuer = builder.Configuration["Token:Issuer"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:SecurityKey"])),

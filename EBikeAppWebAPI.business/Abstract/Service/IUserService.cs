@@ -1,4 +1,5 @@
-﻿using EBikeAppWebAPI.business.ViewModel.User;
+﻿using EBikeAppWebAPI.business.ServiceResponses.User;
+using EBikeAppWebAPI.business.ViewModel.User;
 using EBikeAppWebAPI.entity.Identity;
 using System;
 using System.Collections.Generic;
@@ -22,5 +23,7 @@ namespace EBikeAppWebAPI.business.Abstract.Service
         Task<bool> SendResetPasswordRequest(string email);
         Task<bool> ResetPasswordAsync(ResetPasswordModel model);
         Task<bool> UpdateRefreshToken(AppUser user, string refreshToken, DateTime acccessTokenDate, int addOnAccessTokenSecond);
+        Task<GetLoogedIdUserProfileResponse> GetLoogedIdUserProfile();
+        Task<List<GetLoggedInUserPastRidesResponse>> GetLoggedInUserPastRides();
     }
 }

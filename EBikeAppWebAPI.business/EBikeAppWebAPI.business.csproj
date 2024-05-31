@@ -8,15 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
+    <PackageReference Include="QRCoder" Version="1.5.1" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EBikeAppWebAPI.data\EBikeAppWebAPI.data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Abstract\Storage\" />
-    <Folder Include="Concrete\Storage\" />
   </ItemGroup>
 
 </Project>

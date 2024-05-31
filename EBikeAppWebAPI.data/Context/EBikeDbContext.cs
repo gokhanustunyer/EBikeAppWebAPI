@@ -23,7 +23,6 @@ namespace EBikeAppWebAPI.data.Context
         public DbSet<CreditCard> CreditCards { get; set; }
         public DbSet<Bike> Bikes { get; set; }
         public DbSet<Ride> Rides { get; set; }
-
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             var datas = ChangeTracker.Entries<BaseEntity>();
