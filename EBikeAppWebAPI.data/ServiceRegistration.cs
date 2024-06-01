@@ -6,6 +6,8 @@ using EBikeAppWebAPI.data.Context;
 using EBikeAppWebAPI.data.Abstract.Auth.Endpoint;
 using EBikeAppWebAPI.data.Concrete.Auth.Endpoint;
 using EBikeAppWebAPI.data.Concrete.Auth.Menu;
+using EBikeAppWebAPI.data.Concrete.BikeRepository;
+using EBikeAppWebAPI.data.Abstract.Bike;
 
 namespace EBikeAppWebAPI.data
 {
@@ -17,9 +19,9 @@ namespace EBikeAppWebAPI.data
             var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
             services.AddDbContext<EBikeDbContext>(options => options.UseMySql(connectionString, serverVersion));
 
-
             services.AddScoped<IMenuRepository, MenuRepository>();
             services.AddScoped<IEndpointRepository, EndpointRepository>();
+            services.AddScoped<IBikeRepository, BikeRepository>();
         }
     }
 }
